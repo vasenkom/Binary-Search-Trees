@@ -44,8 +44,69 @@ const prettyPrint = (node, prefix = "", isLeft = true) => {
   }
 };
 
+function insert(root, value) {
+  if (root == null) {
+    return Node(value);
+  }
+
+  if (root.value == value) {
+    return root;
+  }
+
+  if (value < root.value) {
+    root.left = insert(root.left, value);
+  } else if (value > root.value) {
+    root.right = insert(root.right, value);
+  }
+
+  return root;
+}
+
+function deleteItem(root, value) {
+  if (root == null) {
+    return null;
+  }
+
+  if (value < root.value) {
+    root.left = deleteItem(root.left, value);
+  } else if (value > root.value) {
+    root.right = deleteItem(root.right, value);
+  } else {
+    // if root has 0 children or only right child
+    if (root.left == null) {
+      let temp = root.right;
+      root = null;
+      return temp;
+    }
+
+    // When root has only left child
+    if (root.right == null) {
+      let temp = root.left;
+      root = null;
+      return temp;
+    }
+
+    // if node has two children
+    let newArr = reorder(root);
+    root.value = newArr.value;
+    root.right = deleteItem(root.right, newArr.key);
+  }
+
+  return root;
+}
+
+// Works when the right child is not empty
+function reorder(curr) {
+  curr = curr.right;
+  while (curr !== null && curr.left !== null) {
+    curr = curr.left;
+  }
+  return curr;
+}
+
 // Example usage:
-let root = Tree([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324]);
-prettyPrint(root); // This line will print the tree
+let root = Tree([1, 7, 9, 67, 6345, 324]);
+
+prettyPrint(deleteItem(root, 67)); // This line will print the tree
 
 module.exports = { Node, Tree, buildTree, removeDuplicates, prettyPrint };
