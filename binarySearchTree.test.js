@@ -7,5 +7,9 @@ test("test the removeDuplicates()", () => {
 });
 
 test("return sorted no duplicat function", () => {
-  expect(buildTree([1, 9, 2, 2, 3, 4, 5, 5, 7])).toEqual([1, 2, 3, 4, 5, 7, 9]);
+  expect(Tree([1, 9, 2, 2, 3, 4, 5, 5, 7])).toEqual([1, 2, 3, 4, 5, 7, 9]);
+});
+
+test("test if buildtree returns the root node", () => {
+  expect(buildTree([1, 9, 2, 2, 3, 4, 5, 5, 7])).toEqual(4);
 });
