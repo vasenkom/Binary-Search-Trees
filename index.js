@@ -95,6 +95,21 @@ function deleteItem(root, value) {
   return root;
 }
 
+// find(value) function returns the node with the given value
+function find(root, value) {
+  if (root == null) {
+    return null;
+  }
+
+  if (value < root.value) {
+    return find(root.left, value); // search in the left subtree
+  } else if (value > root.value) {
+    return find(root.right, value); // search in the right subtree
+  } else {
+    return root;
+  }
+}
+
 // Works when the right child is not empty
 function reorder(curr) {
   curr = curr.right;
