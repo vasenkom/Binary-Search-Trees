@@ -72,56 +72,147 @@ function deleteItem(root, value) {
   } else if (value > root.value) {
     root.right = deleteItem(root.right, value);
   } else {
-    // if root has 0 children or only right child
+    // Node with only one child or no child
     if (root.left == null) {
-      let temp = root.right;
-      root = null;
-      return temp;
+      return root.right;
+    } else if (root.right == null) {
+      return root.left;
     }
 
-    // When root has only left child
-    if (root.right == null) {
-      let temp = root.left;
-      root = null;
-      return temp;
-    }
+    // Node with two children: Get the inorder successor (smallest in the right subtree)
+    let successor = minValueNode(root.right);
 
-    // if node has two children
-    let newArr = reorder(root);
-    root.value = newArr.value;
-    root.right = deleteItem(root.right, newArr.key);
+    // Copy the inorder successor's content to the node
+    root.value = successor.value;
+
+    // Delete the inorder successor
+    root.right = deleteItem(root.right, successor.value);
   }
 
   return root;
 }
 
-// find(value) function returns the node with the given value
+function minValueNode(node) {
+  let current = node;
+
+  // Loop down to find the leftmost leaf
+  while (current && current.left !== null) {
+    current = current.left;
+  }
+
+  return current;
+}
+
+// Find function returns the node with the given value
 function find(root, value) {
   if (root == null) {
     return null;
   }
 
   if (value < root.value) {
-    return find(root.left, value); // search in the left subtree
+    return find(root.left, value); // Search in the left subtree
   } else if (value > root.value) {
-    return find(root.right, value); // search in the right subtree
+    return find(root.right, value); // Search in the right subtree
   } else {
-    return root;
+    return root; // Value found
   }
 }
 
-// Works when the right child is not empty
-function reorder(curr) {
-  curr = curr.right;
-  while (curr !== null && curr.left !== null) {
-    curr = curr.left;
+function levelOrder(root, callback) {
+  if (typeof callback !== "function") {
+    throw new Error("Callback function is required");
   }
-  return curr;
+
+  if (root === null) {
+    return;
+  }
+
+  let queue = [root]; // Start with the root node in the queue
+
+  while (queue.length > 0) {
+    let currentNode = queue.shift(); // Dequeue the first node
+
+    callback(currentNode); // Apply the callback to the current node
+
+    // Enqueue left and right children if they exist
+    if (currentNode.left !== null) {
+      queue.push(currentNode.left);
+    }
+    if (currentNode.right !== null) {
+      queue.push(currentNode.right);
+    }
+  }
 }
 
-// Example usage:
-let root = Tree([1, 7, 9, 67, 6345, 324]);
+function inOrder(callback, node = this.root, result = []) {
+  if (node === null) return;
 
-prettyPrint(deleteItem(root, 67)); // This line will print the tree
+  inOrder(callback, node.left, result);
+  if (callback) {
+    callback(node);
+  } else {
+    result.push(node.value);
+  }
+  inOrder(callback, node.right, result);
 
-module.exports = { Node, Tree, buildTree, removeDuplicates, prettyPrint };
+  if (!callback) return result;
+}
+
+// Pre-order traversal
+function preOrder(callback, node = this.root, result = []) {
+  if (node === null) return;
+
+  if (callback) {
+    callback(node);
+  } else {
+    result.push(node.value);
+  }
+  preOrder(callback, node.left, result);
+  preOrder(callback, node.right, result);
+
+  if (!callback) return result;
+}
+
+// Post-order traversal
+function postOrder(callback, node = this.root, result = []) {
+  if (node === null) return;
+
+  postOrder(callback, node.left, result);
+  postOrder(callback, node.right, result);
+  if (callback) {
+    callback(node);
+  } else {
+    result.push(node.value);
+  }
+
+  if (!callback) return result;
+}
+
+// Example 1
+let root1 = Tree([1, 7, 9, 67, 6345, 324]);
+
+prettyPrint(deleteItem(root1, 67));
+
+// Example 2
+let customRoot = Node(1);
+customRoot.left = Node(2);
+customRoot.right = Node(3);
+customRoot.left.left = Node(4);
+customRoot.left.right = Node(5);
+
+levelOrder(customRoot, (node) => console.log(node.value)); // Should print: 1 2 3 4 5
+
+module.exports = {
+  Node,
+  Tree,
+  buildTree,
+  removeDuplicates,
+  prettyPrint,
+  insert,
+  deleteItem,
+  find,
+  levelOrder,
+  inOrder,
+  preOrder,
+  postOrder,
+};
